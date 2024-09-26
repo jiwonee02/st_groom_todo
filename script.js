@@ -1,9 +1,10 @@
 const list = document.getElementById("list");
-const createBtn = document.getElementById("create-btn");
+const createBtn = document.getElementById("create_btn");
 
 let todos = [];
 
 createBtn.addEventListener("click", createNewTodo);
+
 function createNewTodo() {
   const item = {
     id: new Date().getTime(),
@@ -59,6 +60,7 @@ function createTodoElement(item) {
   itemEl.append(inputEl);
   itemEl.append(actionsEl);
 
+  // 완료 상태 변경
   checkbox.addEventListener("change", () => {
     item.complete = checkbox.checked;
 
@@ -71,21 +73,25 @@ function createTodoElement(item) {
     saveToLocalStorage();
   });
 
+  // 입력된 값 변경
   inputEl.addEventListener("input", () => {
     item.text = inputEl.value;
   });
 
+  // 수정 모드 해제 시
   inputEl.addEventListener("blur", () => {
     inputEl.setAttribute("disabled", "");
 
     saveToLocalStorage();
   });
 
+  // 수정 버튼 클릭 시
   editBtnEl.addEventListener("click", () => {
     inputEl.removeAttribute("disabled");
     inputEl.focus();
   });
 
+  // 삭제 버튼 클릭 시
   removeBtnEl.addEventListener("click", () => {
     todos = todos.filter((t) => t.id != item.id);
     itemEl.remove();
@@ -99,20 +105,27 @@ function createTodoElement(item) {
 function displayTodos() {
   loadFromLocalStorage();
 
-  for (let i = 0; i < todos.length; i++) {
-    const item = todos[i];
-
-    const { itemEl } = createTodoElement(item);
-
-    list.append(itemEl);
+  // 로컬 스토리지에서 가져온 데이터가 없을 경우 기본 아이템 추가
+  if (todos.length === 0) {
+    const defaultItem = {
+      id: new Date().getTime(),
+      text: "밥먹기",
+      complete: false,
+    };
+    todos.push(defaultItem);
   }
+
+  // 저장된 모든 todo 항목 생성
+  todos.forEach((item) => {
+    const { itemEl } = createTodoElement(item);
+    list.append(itemEl);
+  });
 }
 
 displayTodos();
 
 function saveToLocalStorage() {
   const data = JSON.stringify(todos);
-
   localStorage.setItem("my_todos", data);
 }
 
